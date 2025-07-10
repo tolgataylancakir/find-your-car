@@ -172,29 +172,41 @@ class CarFinder {
     }
 
     startQuestionnaire() {
+        console.log('🚀 Starting questionnaire...');
         this.currentStep = 0;
         this.userAnswers = {};
         this.showScreen('question-screen');
         this.showQuestion();
         this.updateProgress();
         document.getElementById('progress-container').classList.remove('hidden');
+        console.log('✅ Questionnaire started successfully');
     }
 
     showScreen(screenId) {
+        console.log(`📺 Showing screen: ${screenId}`);
         document.querySelectorAll('.screen').forEach(screen => {
             screen.classList.remove('active');
         });
         document.getElementById(screenId).classList.add('active');
+        console.log(`✅ Screen ${screenId} is now active`);
     }
 
     showQuestion() {
+        console.log(`❓ Showing question ${this.currentStep + 1} of ${this.questions.length}`);
         const question = this.questions[this.currentStep];
+        
+        if (!question) {
+            console.error('❌ Question not found for step:', this.currentStep);
+            return;
+        }
         
         document.getElementById('question-title').textContent = question.title;
         document.getElementById('question-subtitle').textContent = question.subtitle;
         
         const optionsContainer = document.getElementById('question-options');
         optionsContainer.innerHTML = '';
+        
+        console.log(`🔧 Creating ${question.options.length} options...`);
         
         question.options.forEach((option, index) => {
             const button = document.createElement('button');
@@ -226,6 +238,8 @@ class CarFinder {
         
         nextBtn.classList.add('disabled');
         nextBtn.textContent = this.currentStep === this.questions.length - 1 ? 'See Results →' : 'Continue →';
+        
+        console.log('✅ Question displayed successfully');
     }
 
     selectOption(value, button) {

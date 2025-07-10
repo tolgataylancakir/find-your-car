@@ -82,24 +82,16 @@ body {
 
 /* Screen transitions */
 .screen {
+    display: none;
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.4s ease;
-    position: absolute;
-    top: 40px;
-    left: 40px;
-    right: 40px;
-    pointer-events: none;
 }
 
 .screen.active {
+    display: block;
     opacity: 1;
     transform: translateY(0);
-    position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
-    pointer-events: auto;
 }
 
 .hidden {
