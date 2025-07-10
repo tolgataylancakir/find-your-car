@@ -2,29 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>🚗 CarMatch Pro - Discover Your Perfect Dream Ride!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarFinder - Find Your Perfect Car</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>🚗 CarMatch Pro - Discover Your Perfect Dream Ride!</h1>
-    <p class="hero-text">Welcome to the ultimate car discovery experience! Whether you're looking for speed, luxury, efficiency, or adventure, we'll help you find the perfect vehicle that matches your lifestyle and budget.</p>
-    
-    <div class="features">
-        <h2>Why Choose CarMatch Pro?</h2>
-        <ul>
-            <li>🎯 <strong>Smart Matching Algorithm</strong> - Our AI analyzes your preferences to find your ideal car</li>
-            <li>💰 <strong>Budget-Friendly Options</strong> - Filter by price range and financing options</li>
-            <li>🔍 <strong>Detailed Reviews</strong> - Real user reviews and expert ratings</li>
-            <li>⚡ <strong>Instant Results</strong> - Get personalized recommendations in seconds</li>
-        </ul>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">🚗 CarFinder</h1>
+            <div class="market-selector">
+                <button id="market-nl" class="market-btn active" data-market="nl">🇳🇱 Nederland</button>
+                <button id="market-de" class="market-btn" data-market="de">🇩🇪 Deutschland</button>
+            </div>
+        </header>
+
+        <main class="main">
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="screen active">
+                <div class="welcome-content">
+                    <h2 class="welcome-title">Find Your Perfect Car</h2>
+                    <p class="welcome-subtitle">We'll help you discover the ideal car for your needs in just a few simple steps.</p>
+                    <div class="welcome-features">
+                        <div class="feature">
+                            <span class="feature-icon">🎯</span>
+                            <span>Personalized recommendations</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">⚡</span>
+                            <span>Quick & easy process</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">🏆</span>
+                            <span>Best matches for your market</span>
+                        </div>
+                    </div>
+                    <button id="start-btn" class="primary-btn">Let's Find Your Car</button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="progress-container" class="progress-container hidden">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <span id="progress-text" class="progress-text">Step 1 of 6</span>
+            </div>
+
+            <!-- Question Screens -->
+            <div id="question-screen" class="screen hidden">
+                <div class="question-content">
+                    <h3 id="question-title" class="question-title"></h3>
+                    <p id="question-subtitle" class="question-subtitle"></p>
+                    <div id="question-options" class="question-options"></div>
+                    <div class="question-navigation">
+                        <button id="back-btn" class="secondary-btn hidden">← Back</button>
+                        <button id="next-btn" class="primary-btn disabled">Continue →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="results-screen" class="screen hidden">
+                <div class="results-content">
+                    <h3 class="results-title">Your Perfect Car Matches</h3>
+                    <p class="results-subtitle">Based on your preferences, here are the best cars for you:</p>
+                    <div id="results-list" class="results-list"></div>
+                    <button id="restart-btn" class="secondary-btn">Start Over</button>
+                </div>
+            </div>
+        </main>
     </div>
-    
-    <div class="cta-section">
-        <h3>Ready to Find Your Dream Car?</h3>
-        <p>Join thousands of satisfied customers who found their perfect vehicle with CarMatch Pro. Start your journey today!</p>
-        <button class="cta-button">Start Car Discovery</button>
-    </div>
-    
+
     <script src="script.js"></script>
 </body>
 </html>
