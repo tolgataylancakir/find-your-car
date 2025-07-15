@@ -5,9 +5,13 @@ class CarFinder {
         this.selectedMarket = 'nl';
         this.userAnswers = {};
         this.questions = [];
+        this.searchResults = [];
+        this.currentPage = 1;
+        this.resultsPerPage = 10;
         
         this.initializeApp();
         this.loadQuestions();
+        this.initializeSearch();
     }
 
     initializeApp() {
@@ -18,6 +22,14 @@ class CarFinder {
                 btn.classList.add('active');
                 this.selectedMarket = btn.dataset.market;
                 this.loadQuestions();
+            });
+        });
+
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const targetTab = tab.id.replace('tab-', '');
+                this.switchTab(targetTab);
             });
         });
 
@@ -39,6 +51,381 @@ class CarFinder {
         document.getElementById('restart-btn').addEventListener('click', () => {
             this.restart();
         });
+    }
+
+    switchTab(tabName) {
+        // Update tab appearance
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+
+        // Switch sections
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(`${tabName}-section`).classList.add('active');
+
+        // Reset to welcome screen when switching to finder
+        if (tabName === 'finder') {
+            this.restart();
+        }
+    }
+
+    initializeSearch() {
+        // Search button
+        document.getElementById('search-btn').addEventListener('click', () => {
+            this.performSearch();
+        });
+
+        // Clear search button
+        document.getElementById('clear-search-btn').addEventListener('click', () => {
+            this.clearSearchForm();
+        });
+
+        // Sort functionality
+        document.getElementById('sort-by').addEventListener('change', () => {
+            this.sortAndDisplayResults();
+        });
+
+        // Pagination
+        document.getElementById('prev-page').addEventListener('click', () => {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                this.displaySearchResults();
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', () => {
+            const totalPages = Math.ceil(this.searchResults.length / this.resultsPerPage);
+            if (this.currentPage < totalPages) {
+                this.currentPage++;
+                this.displaySearchResults();
+            }
+        });
+    }
+
+    clearSearchForm() {
+        document.getElementById('search-make').value = '';
+        document.getElementById('search-model').value = '';
+        document.getElementById('search-price-min').value = '';
+        document.getElementById('search-price-max').value = '';
+        document.getElementById('search-year-min').value = '';
+        document.getElementById('search-fuel').value = '';
+        document.getElementById('search-transmission').value = '';
+        document.getElementById('search-body').value = '';
+        
+        // Hide results
+        document.getElementById('search-results').classList.add('hidden');
+    }
+
+    async performSearch() {
+        const searchParams = this.getSearchParams();
+        
+        // Show loading state
+        document.getElementById('search-loading').classList.remove('hidden');
+        document.getElementById('search-results').classList.add('hidden');
+
+        try {
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // For now, we'll generate mock search results
+            // In a real implementation, this would call actual APIs
+            this.searchResults = this.generateMockSearchResults(searchParams);
+            
+            this.currentPage = 1;
+            this.displaySearchResults();
+            
+        } catch (error) {
+            console.error('Search failed:', error);
+            alert('Search failed. Please try again.');
+        } finally {
+            document.getElementById('search-loading').classList.add('hidden');
+        }
+    }
+
+    getSearchParams() {
+        return {
+            make: document.getElementById('search-make').value,
+            model: document.getElementById('search-model').value,
+            priceMin: document.getElementById('search-price-min').value,
+            priceMax: document.getElementById('search-price-max').value,
+            yearMin: document.getElementById('search-year-min').value,
+            fuel: document.getElementById('search-fuel').value,
+            transmission: document.getElementById('search-transmission').value,
+            body: document.getElementById('search-body').value
+        };
+    }
+
+    generateMockSearchResults(params) {
+        // Mock car listings that would come from Marktplaats, Gaspedaal, etc.
+        const mockCars = [
+            {
+                id: 1,
+                make: 'BMW',
+                model: '3 Series',
+                variant: '320i Executive',
+                year: 2019,
+                price: 28500,
+                mileage: 67000,
+                fuel: 'petrol',
+                transmission: 'automatic',
+                body: 'sedan',
+                power: '184 HP',
+                doors: 4,
+                color: 'Black',
+                location: 'Amsterdam',
+                source: 'Marktplaats',
+                url: 'https://marktplaats.nl/example1',
+                images: ['https://example.com/car1.jpg']
+            },
+            {
+                id: 2,
+                make: 'Volkswagen',
+                model: 'Golf',
+                variant: '1.5 TSI Highline',
+                year: 2020,
+                price: 22900,
+                mileage: 45000,
+                fuel: 'petrol',
+                transmission: 'manual',
+                body: 'hatchback',
+                power: '150 HP',
+                doors: 5,
+                color: 'White',
+                location: 'Rotterdam',
+                source: 'Gaspedaal',
+                url: 'https://gaspedaal.nl/example2',
+                images: ['https://example.com/car2.jpg']
+            },
+            {
+                id: 3,
+                make: 'Audi',
+                model: 'A4',
+                variant: '2.0 TDI Avant',
+                year: 2018,
+                price: 26750,
+                mileage: 78000,
+                fuel: 'diesel',
+                transmission: 'automatic',
+                body: 'wagon',
+                power: '150 HP',
+                doors: 5,
+                color: 'Silver',
+                location: 'Utrecht',
+                source: 'Marktplaats',
+                url: 'https://marktplaats.nl/example3',
+                images: ['https://example.com/car3.jpg']
+            },
+            {
+                id: 4,
+                make: 'Tesla',
+                model: 'Model 3',
+                variant: 'Standard Range Plus',
+                year: 2021,
+                price: 42500,
+                mileage: 32000,
+                fuel: 'electric',
+                transmission: 'automatic',
+                body: 'sedan',
+                power: '283 HP',
+                doors: 4,
+                color: 'Blue',
+                location: 'Den Haag',
+                source: 'Gaspedaal',
+                url: 'https://gaspedaal.nl/example4',
+                images: ['https://example.com/car4.jpg']
+            },
+            {
+                id: 5,
+                make: 'Toyota',
+                model: 'Prius',
+                variant: '1.8 Hybrid Executive',
+                year: 2020,
+                price: 27900,
+                mileage: 55000,
+                fuel: 'hybrid',
+                transmission: 'automatic',
+                body: 'hatchback',
+                power: '122 HP',
+                doors: 5,
+                color: 'Gray',
+                location: 'Eindhoven',
+                source: 'Marktplaats',
+                url: 'https://marktplaats.nl/example5',
+                images: ['https://example.com/car5.jpg']
+            },
+            {
+                id: 6,
+                make: 'Mercedes',
+                model: 'C-Class',
+                variant: 'C180 AMG Line',
+                year: 2019,
+                price: 31200,
+                mileage: 61000,
+                fuel: 'petrol',
+                transmission: 'automatic',
+                body: 'sedan',
+                power: '156 HP',
+                doors: 4,
+                color: 'Black',
+                location: 'Groningen',
+                source: 'Gaspedaal',
+                url: 'https://gaspedaal.nl/example6',
+                images: ['https://example.com/car6.jpg']
+            }
+        ];
+
+        // Filter based on search parameters
+        let filtered = mockCars.filter(car => {
+            if (params.make && car.make.toLowerCase() !== params.make.toLowerCase()) return false;
+            if (params.model && !car.model.toLowerCase().includes(params.model.toLowerCase())) return false;
+            if (params.priceMin && car.price < parseInt(params.priceMin)) return false;
+            if (params.priceMax && car.price > parseInt(params.priceMax)) return false;
+            if (params.yearMin && car.year < parseInt(params.yearMin)) return false;
+            if (params.fuel && car.fuel !== params.fuel) return false;
+            if (params.transmission && car.transmission !== params.transmission) return false;
+            if (params.body && car.body !== params.body) return false;
+            return true;
+        });
+
+        // Generate additional mock results to simulate more findings
+        while (filtered.length < 15 && filtered.length < mockCars.length) {
+            const baseCar = mockCars[Math.floor(Math.random() * mockCars.length)];
+            const newCar = {
+                ...baseCar,
+                id: Date.now() + Math.random(),
+                price: baseCar.price + Math.floor(Math.random() * 10000 - 5000),
+                mileage: baseCar.mileage + Math.floor(Math.random() * 20000),
+                year: Math.max(2015, baseCar.year + Math.floor(Math.random() * 6 - 3)),
+                location: ['Amsterdam', 'Rotterdam', 'Utrecht', 'Den Haag', 'Eindhoven'][Math.floor(Math.random() * 5)]
+            };
+            if (!filtered.find(car => car.id === newCar.id)) {
+                filtered.push(newCar);
+            }
+        }
+
+        return filtered;
+    }
+
+    sortAndDisplayResults() {
+        this.displaySearchResults();
+    }
+
+    displaySearchResults() {
+        const sortBy = document.getElementById('sort-by').value;
+        let sortedResults = [...this.searchResults];
+
+        // Sort results
+        switch (sortBy) {
+            case 'price-low':
+                sortedResults.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-high':
+                sortedResults.sort((a, b) => b.price - a.price);
+                break;
+            case 'year-new':
+                sortedResults.sort((a, b) => b.year - a.year);
+                break;
+            case 'year-old':
+                sortedResults.sort((a, b) => a.year - b.year);
+                break;
+            case 'mileage-low':
+                sortedResults.sort((a, b) => a.mileage - b.mileage);
+                break;
+            default: // relevance
+                // Keep original order
+                break;
+        }
+
+        // Pagination
+        const startIndex = (this.currentPage - 1) * this.resultsPerPage;
+        const endIndex = startIndex + this.resultsPerPage;
+        const paginatedResults = sortedResults.slice(startIndex, endIndex);
+
+        // Update results count
+        document.getElementById('results-count').textContent = `${sortedResults.length} cars found`;
+
+        // Create result cards
+        const resultsContainer = document.getElementById('search-results-list');
+        resultsContainer.innerHTML = '';
+
+        paginatedResults.forEach(car => {
+            const carCard = document.createElement('div');
+            carCard.className = 'search-car-card';
+            carCard.innerHTML = `
+                <div class="car-header">
+                    <div class="car-main-info">
+                        <h4>${car.make} ${car.model} ${car.variant}</h4>
+                        <div class="car-year-mileage">${car.year} • ${car.mileage.toLocaleString()} km</div>
+                    </div>
+                    <div class="car-price">€${car.price.toLocaleString()}</div>
+                </div>
+                
+                <div class="car-details-grid">
+                    <div class="car-detail-item">
+                        <span>⛽</span>
+                        <span>${car.fuel.charAt(0).toUpperCase() + car.fuel.slice(1)}</span>
+                    </div>
+                    <div class="car-detail-item">
+                        <span>⚙️</span>
+                        <span>${car.transmission.charAt(0).toUpperCase() + car.transmission.slice(1)}</span>
+                    </div>
+                    <div class="car-detail-item">
+                        <span>🚗</span>
+                        <span>${car.body.charAt(0).toUpperCase() + car.body.slice(1)}</span>
+                    </div>
+                    <div class="car-detail-item">
+                        <span>⚡</span>
+                        <span>${car.power}</span>
+                    </div>
+                    <div class="car-detail-item">
+                        <span>🚪</span>
+                        <span>${car.doors} doors</span>
+                    </div>
+                    <div class="car-detail-item">
+                        <span>🎨</span>
+                        <span>${car.color}</span>
+                    </div>
+                </div>
+                
+                <div class="car-footer">
+                    <div>
+                        <span class="car-source">${car.source}</span>
+                        <span style="color: rgba(255, 255, 255, 0.6); margin-left: 10px; font-size: 12px;">📍 ${car.location}</span>
+                    </div>
+                    <a href="${car.url}" target="_blank" class="car-link">View Details →</a>
+                </div>
+            `;
+            
+            resultsContainer.appendChild(carCard);
+        });
+
+        // Update pagination
+        this.updatePagination(sortedResults.length);
+
+        // Show results
+        document.getElementById('search-results').classList.remove('hidden');
+    }
+
+    updatePagination(totalResults) {
+        const totalPages = Math.ceil(totalResults / this.resultsPerPage);
+        const prevBtn = document.getElementById('prev-page');
+        const nextBtn = document.getElementById('next-page');
+        const pageInfo = document.getElementById('page-info');
+
+        prevBtn.disabled = this.currentPage === 1;
+        nextBtn.disabled = this.currentPage === totalPages;
+        pageInfo.textContent = `Page ${this.currentPage} of ${totalPages}`;
+
+        // Show/hide pagination
+        const paginationContainer = document.querySelector('.search-pagination');
+        if (totalPages > 1) {
+            paginationContainer.classList.remove('hidden');
+        } else {
+            paginationContainer.classList.add('hidden');
+        }
     }
 
     loadQuestions() {

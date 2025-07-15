@@ -16,58 +16,194 @@
             </div>
         </header>
 
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button id="tab-finder" class="nav-tab active">🎯 Car Finder</button>
+            <button id="tab-search" class="nav-tab">🔍 Search Deals</button>
+        </nav>
+
         <main class="main">
-            <!-- Welcome Screen -->
-            <div id="welcome-screen" class="screen active">
-                <div class="welcome-content">
-                    <h2 class="welcome-title">Find Your Perfect Car</h2>
-                    <p class="welcome-subtitle">We'll help you discover the ideal car for your needs in just a few simple steps.</p>
-                    <div class="welcome-features">
-                        <div class="feature">
-                            <span class="feature-icon">🎯</span>
-                            <span>Personalized recommendations</span>
+            <!-- Car Finder Section -->
+            <div id="finder-section" class="section active">
+                <!-- Welcome Screen -->
+                <div id="welcome-screen" class="screen active">
+                    <div class="welcome-content">
+                        <h2 class="welcome-title">Find Your Perfect Car</h2>
+                        <p class="welcome-subtitle">We'll help you discover the ideal car for your needs in just a few simple steps.</p>
+                        <div class="welcome-features">
+                            <div class="feature">
+                                <span class="feature-icon">🎯</span>
+                                <span>Personalized recommendations</span>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-icon">⚡</span>
+                                <span>Quick & easy process</span>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-icon">🏆</span>
+                                <span>Best matches for your market</span>
+                            </div>
                         </div>
-                        <div class="feature">
-                            <span class="feature-icon">⚡</span>
-                            <span>Quick & easy process</span>
-                        </div>
-                        <div class="feature">
-                            <span class="feature-icon">🏆</span>
-                            <span>Best matches for your market</span>
-                        </div>
-                    </div>
-                    <button id="start-btn" class="primary-btn">Let's Find Your Car</button>
-                </div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div id="progress-container" class="progress-container hidden">
-                <div class="progress-bar">
-                    <div id="progress-fill" class="progress-fill"></div>
-                </div>
-                <span id="progress-text" class="progress-text">Step 1 of 6</span>
-            </div>
-
-            <!-- Question Screens -->
-            <div id="question-screen" class="screen hidden">
-                <div class="question-content">
-                    <h3 id="question-title" class="question-title"></h3>
-                    <p id="question-subtitle" class="question-subtitle"></p>
-                    <div id="question-options" class="question-options"></div>
-                    <div class="question-navigation">
-                        <button id="back-btn" class="secondary-btn hidden">← Back</button>
-                        <button id="next-btn" class="primary-btn disabled">Continue →</button>
+                        <button id="start-btn" class="primary-btn">Let's Find Your Car</button>
                     </div>
                 </div>
+
+                <!-- Progress Bar -->
+                <div id="progress-container" class="progress-container hidden">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <span id="progress-text" class="progress-text">Step 1 of 6</span>
+                </div>
+
+                <!-- Question Screens -->
+                <div id="question-screen" class="screen hidden">
+                    <div class="question-content">
+                        <h3 id="question-title" class="question-title"></h3>
+                        <p id="question-subtitle" class="question-subtitle"></p>
+                        <div id="question-options" class="question-options"></div>
+                        <div class="question-navigation">
+                            <button id="back-btn" class="secondary-btn hidden">← Back</button>
+                            <button id="next-btn" class="primary-btn disabled">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Screen -->
+                <div id="results-screen" class="screen hidden">
+                    <div class="results-content">
+                        <h3 class="results-title">Your Perfect Car Matches</h3>
+                        <p class="results-subtitle">Based on your preferences, here are the best cars for you:</p>
+                        <div id="results-list" class="results-list"></div>
+                        <button id="restart-btn" class="secondary-btn">Start Over</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Results Screen -->
-            <div id="results-screen" class="screen hidden">
-                <div class="results-content">
-                    <h3 class="results-title">Your Perfect Car Matches</h3>
-                    <p class="results-subtitle">Based on your preferences, here are the best cars for you:</p>
-                    <div id="results-list" class="results-list"></div>
-                    <button id="restart-btn" class="secondary-btn">Start Over</button>
+            <!-- Search Section -->
+            <div id="search-section" class="section hidden">
+                <div class="search-content">
+                    <h2 class="search-title">Search Car Deals</h2>
+                    <p class="search-subtitle">Find real car listings from Marktplaats, Gaspedaal and other sources</p>
+                    
+                    <div class="search-form">
+                        <div class="search-row">
+                            <div class="search-field">
+                                <label for="search-make">Make</label>
+                                <select id="search-make" class="search-input">
+                                    <option value="">Any Make</option>
+                                    <option value="audi">Audi</option>
+                                    <option value="bmw">BMW</option>
+                                    <option value="mercedes">Mercedes-Benz</option>
+                                    <option value="volkswagen">Volkswagen</option>
+                                    <option value="toyota">Toyota</option>
+                                    <option value="nissan">Nissan</option>
+                                    <option value="volvo">Volvo</option>
+                                    <option value="peugeot">Peugeot</option>
+                                    <option value="renault">Renault</option>
+                                    <option value="ford">Ford</option>
+                                    <option value="opel">Opel</option>
+                                    <option value="skoda">Škoda</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label for="search-model">Model</label>
+                                <input type="text" id="search-model" class="search-input" placeholder="e.g. Golf, A4, 3 Series">
+                            </div>
+                        </div>
+
+                        <div class="search-row">
+                            <div class="search-field">
+                                <label for="search-price-min">Min Price (€)</label>
+                                <input type="number" id="search-price-min" class="search-input" placeholder="0" min="0">
+                            </div>
+                            <div class="search-field">
+                                <label for="search-price-max">Max Price (€)</label>
+                                <input type="number" id="search-price-max" class="search-input" placeholder="100000" min="0">
+                            </div>
+                        </div>
+
+                        <div class="search-row">
+                            <div class="search-field">
+                                <label for="search-year-min">Min Year</label>
+                                <input type="number" id="search-year-min" class="search-input" placeholder="2015" min="1990" max="2024">
+                            </div>
+                            <div class="search-field">
+                                <label for="search-fuel">Fuel Type</label>
+                                <select id="search-fuel" class="search-input">
+                                    <option value="">Any Fuel</option>
+                                    <option value="petrol">Petrol</option>
+                                    <option value="diesel">Diesel</option>
+                                    <option value="electric">Electric</option>
+                                    <option value="hybrid">Hybrid</option>
+                                    <option value="lpg">LPG</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="search-row">
+                            <div class="search-field">
+                                <label for="search-transmission">Transmission</label>
+                                <select id="search-transmission" class="search-input">
+                                    <option value="">Any</option>
+                                    <option value="manual">Manual</option>
+                                    <option value="automatic">Automatic</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label for="search-body">Body Type</label>
+                                <select id="search-body" class="search-input">
+                                    <option value="">Any Type</option>
+                                    <option value="hatchback">Hatchback</option>
+                                    <option value="sedan">Sedan</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="wagon">Wagon</option>
+                                    <option value="coupe">Coupe</option>
+                                    <option value="convertible">Convertible</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="search-actions">
+                            <button id="search-btn" class="primary-btn">🔍 Search Cars</button>
+                            <button id="clear-search-btn" class="secondary-btn">Clear Filters</button>
+                        </div>
+                    </div>
+
+                    <!-- Search Results -->
+                    <div id="search-results" class="search-results hidden">
+                        <div class="results-header">
+                            <h3 id="search-results-title">Search Results</h3>
+                            <div class="results-info">
+                                <span id="results-count">0 cars found</span>
+                                <div class="sort-options">
+                                    <label for="sort-by">Sort by:</label>
+                                    <select id="sort-by" class="sort-select">
+                                        <option value="relevance">Relevance</option>
+                                        <option value="price-low">Price: Low to High</option>
+                                        <option value="price-high">Price: High to Low</option>
+                                        <option value="year-new">Year: Newest First</option>
+                                        <option value="year-old">Year: Oldest First</option>
+                                        <option value="mileage-low">Mileage: Low to High</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="search-results-list" class="search-results-list"></div>
+                        
+                        <div class="search-pagination hidden">
+                            <button id="prev-page" class="pagination-btn">← Previous</button>
+                            <span id="page-info">Page 1 of 10</span>
+                            <button id="next-page" class="pagination-btn">Next →</button>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="search-loading" class="search-loading hidden">
+                        <div class="loading-spinner"></div>
+                        <p>Searching for cars across multiple platforms...</p>
+                    </div>
                 </div>
             </div>
         </main>
