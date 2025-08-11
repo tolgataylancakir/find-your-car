@@ -1,7 +1,8 @@
 from typing import List, Optional, Dict, Any
 from datetime import timedelta
 import asyncio
-from urllib.parse import quote, urlencode
+from urllib.parse import urlencode
+import os
 
 import httpx
 from bs4 import BeautifulSoup
@@ -10,11 +11,15 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-# Playwright for headless fallback
-# Playwright disabled in this environment
+# Optional: load .env for local config
+try:
+    from dotenv import load_dotenv  # type: ignore
+    load_dotenv()
+except Exception:
+    pass
 
 
-app = FastAPI(title="Car Deals Scraper API", version="0.2.1")
+app = FastAPI(title="Car Deals Scraper API", version="0.2.2")
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +32,11 @@ app.add_middleware(
 # In-memory cache: query->results for 15 minutes, per-source pages cached too
 query_cache: TTLCache[str, Any] = TTLCache(maxsize=512, ttl=15 * 60)
 page_cache: TTLCache[str, str] = TTLCache(maxsize=1024, ttl=15 * 60)
+
+# Proxy config (optional)
+SCRAPER_API_KEY = os.getenv("SCRAPER_API_KEY")
+SCRAPINGBEE_API_KEY = os.getenv("SCRAPINGBEE_API_KEY")
+PREFERRED_PROXY = os.getenv("SCRAPER_PROVIDER", "scraperapi")  # 'scraperapi' or 'scrapingbee'
 
 
 class Listing(BaseModel):
@@ -113,17 +123,68 @@ def compute_deal_score(price: Optional[float], mileage_km: Optional[int]) -> Opt
     return round(score, 3)
 
 
-async def fetch_html_httpx(client: httpx.AsyncClient, url: str, headers: Optional[Dict[str, str]] = None) -> str:
+async def fetch_via_proxy(client: httpx.AsyncClient, url: str, headers: Optional[Dict[str, str]], country_code: Optional[str]) -> Optional[str]:
+    provider = None
+    if SCRAPER_API_KEY and PREFERRED_PROXY.lower() == "scraperapi":
+        provider = "scraperapi"
+    elif SCRAPINGBEE_API_KEY and PREFERRED_PROXY.lower() == "scrapingbee":
+        provider = "scrapingbee"
+    elif SCRAPER_API_KEY:
+        provider = "scraperapi"
+    elif SCRAPINGBEE_API_KEY:
+        provider = "scrapingbee"
+    if provider is None:
+        return None
+
+    if provider == "scraperapi":
+        params = {
+            "api_key": SCRAPER_API_KEY,
+            "url": url,
+            "keep_headers": "true",
+            "render": "false",
+        }
+        if country_code:
+            params["country_code"] = country_code.lower()
+        proxy_url = "https://api.scraperapi.com/"
+        resp = await client.get(proxy_url, params=params, headers=headers or DEFAULT_HEADERS, timeout=35)
+        resp.raise_for_status()
+        return resp.text
+
+    if provider == "scrapingbee":
+        params = {
+            "api_key": SCRAPINGBEE_API_KEY,
+            "url": url,
+            "render_js": "false",
+            "premium_proxy": "true",
+        }
+        if country_code:
+            params["country_code"] = country_code.upper()
+        proxy_url = "https://app.scrapingbee.com/api/v1/"
+        resp = await client.get(proxy_url, params=params, headers=headers or DEFAULT_HEADERS, timeout=35)
+        resp.raise_for_status()
+        return resp.text
+
+    return None
+
+
+async def fetch_html_httpx(client: httpx.AsyncClient, url: str, headers: Optional[Dict[str, str]] = None, country_code: Optional[str] = None) -> str:
     combined_headers = {**DEFAULT_HEADERS, **(headers or {})}
-    resp = await client.get(url, headers=combined_headers, timeout=25)
-    resp.raise_for_status()
-    return resp.text
+    try:
+        resp = await client.get(url, headers=combined_headers, timeout=25)
+        resp.raise_for_status()
+        return resp.text
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code in (403, 404):
+            proxied = await fetch_via_proxy(client, url, combined_headers, country_code)
+            if proxied is not None:
+                return proxied
+        raise
 
 
-async def fetch_html(client: httpx.AsyncClient, url: str, headers: Optional[Dict[str, str]] = None) -> str:
+async def fetch_html(client: httpx.AsyncClient, url: str, headers: Optional[Dict[str, str]] = None, country_code: Optional[str] = None) -> str:
     if url in page_cache:
         return page_cache[url]
-    html = await fetch_html_httpx(client, url, headers=headers)
+    html = await fetch_html_httpx(client, url, headers=headers, country_code=country_code)
     page_cache[url] = html
     return html
 
@@ -168,7 +229,7 @@ def norm_listing(source: str, url: str, title: str, price_text: Optional[str], m
 
 async def scrape_marktplaats(client: httpx.AsyncClient, make: str, model: Optional[str], price_max: Optional[int], limit: int = 10) -> List[Listing]:
     url = build_marktplaats_link(make, model, price_max)
-    html = await fetch_html(client, url, headers=MARKTPLAATS_HEADERS)
+    html = await fetch_html(client, url, headers=MARKTPLAATS_HEADERS, country_code="nl")
     soup = BeautifulSoup(html, "html.parser")
 
     listings: List[Listing] = []
@@ -183,9 +244,7 @@ async def scrape_marktplaats(client: httpx.AsyncClient, make: str, model: Option
             continue
         # Real listings on Marktplaats typically use /v/ path
         if href.startswith('http'):
-            if 'marktplaats.nl' not in href:
-                continue
-            if '/v/' not in href:
+            if 'marktplaats.nl' not in href or '/v/' not in href:
                 continue
             full_url = href
         else:
