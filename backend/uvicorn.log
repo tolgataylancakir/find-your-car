@@ -5,3 +5,5 @@ INFO:     Started server process [5191]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     127.0.0.1:59014 - "GET /health HTTP/1.1" 200 OK
+INFO:     178.224.137.213:0 - "GET /search?make=BMW&model=320&price_max=15000&limit=5 HTTP/1.1" 200 OK
+INFO:     178.224.137.213:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
