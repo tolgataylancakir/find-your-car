@@ -10,8 +10,11 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+# Playwright for headless fallback
+# Playwright disabled in this environment
 
-app = FastAPI(title="Car Deals Scraper API", version="0.1.1")
+
+app = FastAPI(title="Car Deals Scraper API", version="0.2.1")
 
 app.add_middleware(
     CORSMiddleware,
@@ -69,8 +72,8 @@ MOBILE_DE_HEADERS = {
 
 
 def build_marktplaats_link(make: str, model: Optional[str], price_max: Optional[int]) -> str:
-    # Encode path segment for auto's
-    base = "https://www.marktplaats.nl/q/auto's/"
+    # Use explicit category path for cars (auto's) search
+    base = "https://www.marktplaats.nl/l/auto-s/"
     q_parts = []
     if make:
         q_parts.append(make)
@@ -78,10 +81,12 @@ def build_marktplaats_link(make: str, model: Optional[str], price_max: Optional[
         q_parts.append(model)
     q = "+".join(q_parts)
     params = []
+    if q:
+        params.append(("q", q))
     if price_max:
         params.append(("prijsTot", str(price_max)))
     query = urlencode(params)
-    return f"{base}{q}/?{query}" if query else f"{base}{q}/"
+    return f"{base}?{query}" if query else base
 
 
 def build_mobile_de_link(make: str, model: Optional[str], price_max: Optional[int]) -> str:
@@ -89,10 +94,9 @@ def build_mobile_de_link(make: str, model: Optional[str], price_max: Optional[in
     params: Dict[str, str] = {
         "isSearchRequest": "true",
     }
-    # Note: mobile.de expects numeric makeId; this is a placeholder deep link
     if make:
         params["makeModelVariant1.modelDescription"] = model or ""
-        params["makeModelVariant1.makeId"] = make  # placeholder; later map names to IDs
+        params["makeModelVariant1.makeId"] = make
     if price_max:
         params["maxPrice"] = str(price_max)
     return f"{base}?{urlencode(params)}"
@@ -109,14 +113,19 @@ def compute_deal_score(price: Optional[float], mileage_km: Optional[int]) -> Opt
     return round(score, 3)
 
 
+async def fetch_html_httpx(client: httpx.AsyncClient, url: str, headers: Optional[Dict[str, str]] = None) -> str:
+    combined_headers = {**DEFAULT_HEADERS, **(headers or {})}
+    resp = await client.get(url, headers=combined_headers, timeout=25)
+    resp.raise_for_status()
+    return resp.text
+
+
 async def fetch_html(client: httpx.AsyncClient, url: str, headers: Optional[Dict[str, str]] = None) -> str:
     if url in page_cache:
         return page_cache[url]
-    combined_headers = {**DEFAULT_HEADERS, **(headers or {})}
-    resp = await client.get(url, headers=combined_headers, timeout=20)
-    resp.raise_for_status()
-    page_cache[url] = resp.text
-    return resp.text
+    html = await fetch_html_httpx(client, url, headers=headers)
+    page_cache[url] = html
+    return html
 
 
 def parse_price(text: str) -> Optional[float]:
@@ -163,16 +172,26 @@ async def scrape_marktplaats(client: httpx.AsyncClient, make: str, model: Option
     soup = BeautifulSoup(html, "html.parser")
 
     listings: List[Listing] = []
-    # Heuristic selectors; may need adjustment if DOM changes
-    cards = soup.select('[data-testid="listing-card"], article, li')
-    for card in cards[:limit * 2]:
+    # Only pick explicit listing cards to avoid help/info links
+    cards = soup.select('[data-testid="listing-card"]')
+    for card in cards:
         a = card.select_one('a[href]')
         if not a:
             continue
         href = a.get('href')
         if not href:
             continue
-        full_url = href if href.startswith('http') else f"https://www.marktplaats.nl{href}"
+        # Real listings on Marktplaats typically use /v/ path
+        if href.startswith('http'):
+            if 'marktplaats.nl' not in href:
+                continue
+            if '/v/' not in href:
+                continue
+            full_url = href
+        else:
+            if '/v/' not in href:
+                continue
+            full_url = f"https://www.marktplaats.nl{href}"
         title_el = card.select_one('[data-testid="listing-title"], h3, h2')
         title = title_el.get_text(strip=True) if title_el else a.get_text(strip=True) or "Listing"
         price_el = card.select_one('[data-testid="price"], .price, [class*="Price"]')
@@ -192,7 +211,7 @@ async def scrape_marktplaats(client: httpx.AsyncClient, make: str, model: Option
 
 
 async def scrape_mobile_de(client: httpx.AsyncClient, make: str, model: Optional[str], price_max: Optional[int], limit: int = 10) -> List[Listing]:
-    # Temporarily disabled scraping due to frequent 403; keep deep link only
+    # Disabled scraping in this environment to avoid 403s without headless fallback
     return []
 
 
