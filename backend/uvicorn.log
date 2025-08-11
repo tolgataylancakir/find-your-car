@@ -7,3 +7,37 @@ INFO:     Application startup complete.
 INFO:     127.0.0.1:59014 - "GET /health HTTP/1.1" 200 OK
 INFO:     178.224.137.213:0 - "GET /search?make=BMW&model=320&price_max=15000&limit=5 HTTP/1.1" 200 OK
 INFO:     178.224.137.213:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [5191]
+INFO:     Started server process [7761]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [7761]
+INFO:     Started server process [7915]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     34.194.89.111:0 - "GET /search?make=BMW&model=320&price_max=15000&limit=5 HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [7915]
+INFO:     Started server process [8118]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8118]
+INFO:     Started server process [8283]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     54.208.222.198:0 - "GET /search?make=BMW&model=320&price_max=15000&limit=5 HTTP/1.1" 200 OK
