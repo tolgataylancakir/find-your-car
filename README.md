@@ -78,3 +78,23 @@ A smart, step-by-step web application that guides users to discover their ideal 
 ## 📄 License
 
 MIT License - Feel free to use and modify as needed.
+
+## Running with real NL listings (experimental)
+
+- Install dependencies:
+
+```
+npm install
+```
+
+- Start the server:
+
+```
+npm run start
+```
+
+- Open the app at `http://localhost:3000` and use the Search tab. This will call `POST /api/search-cars` to fetch best-effort listings from Marktplaats based on your filters.
+
+Notes:
+- This is a lightweight, best-effort parser using public page metadata; fields like price or year may be missing.
+- Respect websites' terms of service and robots.txt when integrating other sources.
