@@ -127,12 +127,34 @@ class CarFinder {
         document.getElementById('search-results').classList.add('hidden');
 
         try {
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            // For now, we'll generate mock search results
-            // In a real implementation, this would call actual APIs
-            this.searchResults = this.generateMockSearchResults(searchParams);
+            const response = await fetch('/api/search-cars', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ market: this.selectedMarket, ...searchParams })
+            });
+            const data = await response.json();
+            const cars = Array.isArray(data?.cars) ? data.cars : [];
+
+            // Normalize minimal fields expected by the renderer; fallback to placeholders
+            this.searchResults = cars.map((car, idx) => ({
+                id: car.id || idx + 1,
+                make: car.make || 'Unknown',
+                model: car.model || '',
+                variant: car.variant || '',
+                year: car.year || new Date().getFullYear(),
+                price: car.price || 0,
+                mileage: car.mileage || 0,
+                fuel: car.fuel || 'petrol',
+                transmission: car.transmission || 'manual',
+                body: car.body || 'hatchback',
+                power: car.power || '',
+                doors: car.doors || 4,
+                color: car.color || '',
+                location: car.location || 'NL',
+                source: car.source || 'Marktplaats',
+                url: car.url || '#',
+                images: Array.isArray(car.images) ? car.images : []
+            }));
             
             this.currentPage = 1;
             this.displaySearchResults();
