@@ -20,6 +20,8 @@
         <nav class="nav-tabs">
             <button id="tab-finder" class="nav-tab active">🎯 Car Finder</button>
             <button id="tab-search" class="nav-tab">🔍 Search Deals</button>
+            <button id="tab-saved" class="nav-tab">💾 Saved</button>
+            <button id="tab-compare" class="nav-tab">📊 Compare</button>
         </nav>
 
         <main class="main">
@@ -85,6 +87,14 @@
                 <div class="search-content">
                     <h2 class="search-title">Search Car Deals</h2>
                     <p class="search-subtitle">Find real car listings from Marktplaats, Gaspedaal and other sources</p>
+                    
+                    <div class="info-banner">
+                        <label class="toggle">
+                            <input type="checkbox" id="demo-mode-toggle">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">Demo mode (offline mock results)</span>
+                        </label>
+                    </div>
                     
                     <div class="search-form">
                         <div class="search-row">
@@ -206,9 +216,52 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Saved Section -->
+            <div id="saved-section" class="section hidden">
+                <div class="saved-content">
+                    <h2 class="saved-title">Saved Cars</h2>
+                    <p class="saved-subtitle">Cars you’ve saved for later. They’re stored on this device.</p>
+                    <div id="saved-list" class="saved-list"></div>
+                    <div id="saved-empty" class="empty-state hidden">No saved cars yet. Save some from the Search tab.</div>
+                </div>
+            </div>
+
+            <!-- Compare Section -->
+            <div id="compare-section" class="section hidden">
+                <div class="compare-content">
+                    <h2 class="compare-title">Compare Cars</h2>
+                    <p class="compare-subtitle">Select up to 4 cars to compare key specs side by side.</p>
+                    <div id="compare-empty" class="empty-state">No cars selected for comparison.</div>
+                    <div id="compare-table-wrapper" class="compare-table-wrapper hidden">
+                        <div class="compare-controls">
+                            <button id="clear-compare" class="secondary-btn">Clear Selection</button>
+                        </div>
+                        <table id="compare-table" class="compare-table"></table>
+                    </div>
+                </div>
+            </div>
         </main>
+        
+        <footer class="site-footer">
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="help.html">Help</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+            </div>
+        </footer>
     </div>
 
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').catch(function(){});
+            });
+        }
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
