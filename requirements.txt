@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+sqlmodel
+pydantic
+python-multipart
+requests
+python-dotenv
