@@ -3,6 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, List, Optional
 
+import requests
+
+from ..config import settings
+
 
 @dataclass
 class MarktplaatsAd:
@@ -17,10 +21,44 @@ class MarktplaatsAd:
 
 class MarktplaatsClient:
     def __init__(self) -> None:
-        pass
+        self.mode = settings.marktplaats_mode
+        self.base_url = settings.marktplaats_api_base_url
+        self.api_key = settings.marktplaats_api_key
+        self.bearer = settings.marktplaats_bearer_token
 
     def search(self, query: str) -> Iterable[MarktplaatsAd]:
-        # Stubbed sample data for MVP without real scraper/API
+        if self.mode == "api" and self.base_url:
+            try:
+                headers = {}
+                if self.api_key:
+                    headers["X-API-Key"] = self.api_key
+                if self.bearer:
+                    headers["Authorization"] = f"Bearer {self.bearer}"
+                resp = requests.get(
+                    f"{self.base_url.rstrip('/')}/search",
+                    params={"q": query},
+                    headers=headers,
+                    timeout=10,
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                ads: List[MarktplaatsAd] = []
+                for item in data.get("results", []):
+                    ads.append(
+                        MarktplaatsAd(
+                            ad_id=str(item.get("id")),
+                            title=item.get("title") or "",
+                            price=item.get("price"),
+                            distance_km=item.get("distance_km"),
+                            url=item.get("url") or "",
+                            photo_urls=item.get("photos", [])[:3],
+                            corner_side=item.get("corner_side"),
+                        )
+                    )
+                return ads
+            except Exception as exc:
+                print(f"Marktplaats API error, falling back to stub: {exc}")
+        # Fallback: stubbed sample data for MVP
         sample: List[MarktplaatsAd] = [
             MarktplaatsAd(
                 ad_id="A1",
